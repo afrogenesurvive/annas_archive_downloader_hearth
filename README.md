@@ -114,6 +114,17 @@ Here you can put one of the following parameters:
 - `text`. This tells the script to not expect a link to a List and instead read the AA links directly from a `.txt` file, named `aa_links.txt`, that you will put in the `AAdownloads` folder (or what you've called it).
 - `retry`. To be used after hearth has already completed a queue of links, be it from a List link or `aa_links.txt`, and has failed to download some of them. This tells the script to retry all of the downloads that failed from the previous queue. ATTENTION: This requires the downloads folder to be the same as the previous operation (the one of which you want to retry the failed links).
 
+Note: when using `text` mode, the `aa_links.txt` file should be formatted in the following way:
+```
+https://annas-archive.XX/md5/<md5_code_0>
+
+https://annas-archive.XX/md5/<md5_code_1>
+
+https://annas-archive.XX/md5/<md5_code_2>
+
+...
+```
+
 ## <DOWNLOAD_FOLDER_DIRECTORY>
 
 Here you have to put the directory of the folder `AAdownloads` (or the name you chose for it).
