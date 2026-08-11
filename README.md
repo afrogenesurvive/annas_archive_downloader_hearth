@@ -157,7 +157,7 @@ This script officially supports and has been tested with:
 
 # License
 
-This project is under the MIT license. Check out `license.md` for more details.
+This project is under the MIT license. Check out `LICENSE` for more details.
 
 # Issues and suggestions
 
