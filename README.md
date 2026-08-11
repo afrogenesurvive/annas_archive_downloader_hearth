@@ -68,7 +68,8 @@ pip3 install playwright
 playwright install chromium
 playwright install-deps
 ```
-*Note: the install-deps command might ask for your system password to install missing browser libraries.*
+*Note - IN CASE OF ERROR: if `pip3 install playwright` raises an `externally-managed-environment` error, running `python3 -m pip install playwright` instead should fix it.*
+*Note: the `install-deps` command might ask for your system password to install missing browser libraries.*
 
 With this, we have everything necessary.
 
@@ -95,7 +96,7 @@ To correctly use hearth, follow this scheme:
 ```
 python hearth.py <OPERATING_MODE/LIST_LINK> <DOWNLOAD_FOLDER_DIRECTORY> [FILENAME_FORMAT]
 ```
-These re the options you have:
+These are the options you have:
 
 ## <OPERATING_MODE/LIST_LINK>
 
@@ -103,7 +104,7 @@ Here you can put one of the following parameters:
 
 - The link to your Anna's Archive List. An example is `https://annas-archive.XX/list/<list_id>`.
 - `text`. This tells the script to not expect a link to a List and instead read the AA links directly from a `.txt` file, named `aa_links.txt`, that you will put in the `AAdownloads` folder (or what you've called it).
-- `retry`. To be used after hearth has already completed a queue of links, be it from a List link or `aa_links.txt`, and has failed to download some of them. This tells the script to retry all of the downloads that failed form the previous queue. ATTENTION: This required the downloads folder to be the same as the previous operation (the one of which you want to retry the failed links).
+- `retry`. To be used after hearth has already completed a queue of links, be it from a List link or `aa_links.txt`, and has failed to download some of them. This tells the script to retry all of the downloads that failed from the previous queue. ATTENTION: This requires the downloads folder to be the same as the previous operation (the one of which you want to retry the failed links).
 
 ## <DOWNLOAD_FOLDER_DIRECTORY>
 
@@ -118,7 +119,11 @@ If you hadn't created it until now, it will be created once you launch the scrip
 
 **Linux example**:
 ```
-"~/hearth/AAdownloads"
+~/hearth/AAdownloads
+```
+or (as in some Linux shells (like Bash or Zsh), tilde expansion does not work inside double quotes)
+```
+"/home/<your username>/hearth/AAdownloads"
 ```
 
 ## [FILENAME_FORMAT]
@@ -138,7 +143,7 @@ As the browser controlled by Playwright is automated, it cannot solve Captchas.
 
 At the launch of the script, when the main List link is loaded or when a mirror "slow download" link is loaded for the first time, the browser might ask you to solve a Captcha. The script will wait for you to do so.
 
-Normally, solving the Captcha that appears at the load of the main List page as well as the one that appears at the first load of a mirror "slow download" link <ins>is enough for the rest of the session</ins>.
+Normally, solving the Captcha that appears at the load of the main List page as well as the one that appears at the first load of a mirror "slow download" link **_is enough for the rest of the session_**.
 
 # What this script supports
 
