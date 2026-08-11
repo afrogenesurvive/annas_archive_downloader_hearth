@@ -34,6 +34,8 @@ winget install Python.Python.3.12 --source winget
 ```
 substituting `3.12` with the latest version.
 
+Alternatively, open CMD, type `python`, and press Enter. This will automatically open the Microsoft Store to the most up-to-date version of Python available for your system.
+
 **Installation of necessary tools**:
 
 The script needs a tool called "Playwright" to control the web browser.
@@ -51,11 +53,22 @@ With this, we have everything necessary.
 ### On Linux:
 **Python installation**:
 
-[to do]
+Most Linux distributions already have Python installed. You just need to ensure you have `pip` (the package installer) to download the necessary tools.  
+Open your terminal and run the following command (this example uses `apt` for Debian/Ubuntu-based systems, but you should easily be able to find the specific command for your distro):
+```
+sudo apt update && sudo apt install python3 python3-pip
+```
 
 **Installation of necessary tools**:
 
-[to do]
+The script needs a tool called "Playwright" to control the web browser, plus a few system dependencies to run it.  
+Open your terminal and run these commands one by one:
+```
+pip3 install playwright
+playwright install chromium
+playwright install-deps
+```
+*Note: the install-deps command might ask for your system password to install missing browser libraries.*
 
 With this, we have everything necessary.
 
@@ -72,6 +85,7 @@ To launch hearth, simply open your terminal directly inside of the folder that c
 ```
 python hearth.py
 ```
+*ATTENTION: as older versions of Linux used to ship with both Python 2 and Python 3, the launch command on Linux is almost always `python3`, not just `python`. Linux users should type `python3 hearth.py` instead. Assume this for the next steps.*
 
 # Usage
 
@@ -104,7 +118,7 @@ If you hadn't created it until now, it will be created once you launch the scrip
 
 **Linux example**:
 ```
-~/home/<your username>/hearth/AAdownloads
+"~/hearth/AAdownloads"
 ```
 
 ## [FILENAME_FORMAT]
@@ -117,6 +131,14 @@ You can leave it blank (which is the default and corresponds to `full`) or put o
 - `info`. This tells the script to save in the file's name all the info that Anna's Archive suggests, however excluding the md5 code and "Anna's Archive" at the end.
 - `author`. This tells the script to save only the Title and the Author, in which case a hyphen will be put between the two.
 - `title`. This tells the script to save only the Title of the media you're downloading.
+
+## IMPORTANT STEP: CAPTCHAS
+
+As the browser controlled by Playwright is automated, it cannot solve Captchas.
+
+At the launch of the script, when the main List link is loaded or when a mirror "slow download" link is loaded for the first time, the browser might ask you to solve a Captcha. The script will wait for you to do so.
+
+Normally, solving the Captcha that appears at the load of the main List page as well as the one that appears at the first load of a mirror "slow download" link <ins>is enough for the rest of the session</ins>.
 
 # What this script supports
 
