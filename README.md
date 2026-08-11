@@ -11,7 +11,7 @@ hearth is a Python script to help mass download an Anna's Archive List. It has b
 - This is a terminal tool that accepts command line parameters to function (more about usage below).
 - hearth supports Anna's Archive List links in the form of `https://annas-archive.XX/list/<list_id>` as well as importing a list of Anna's Archive links from a `.txt` file.
 - The tool will spin up a virtual browser that physically visits the link page, waits for the download cooldown and renames the downloaded file, before going ahead to the next List element, logging successes and failures in specific files.
-- These files allow to not only stop the script mid-way, closing the terminal windows completely, and then resuming from the last link it successfully downloaded by using the same exact command, but it also allows to retry for failed links once the tool has finished processing the whole queue.
+- These files allow you to not only stop the script mid-way, closing the terminal windows completely, and then resuming from the last link it successfully downloaded (by using the same exact command), but it also allows to retry for failed links once the tool has finished processing the whole queue.
 - You can use the `completed.txt` file that the script will create in your download directory as an index of all the files you downloaded as well as their md5 code.
 - The download destination folder is chosen via command line parameters. Here will be stored said files.
 - You can set how to rename the downloaded files, based on how much information you want to be in the filename, via command line parameters.
@@ -68,8 +68,16 @@ pip3 install playwright
 playwright install chromium
 playwright install-deps
 ```
-*Note - IN CASE OF ERROR: if `pip3 install playwright` raises an `externally-managed-environment` error, running `python3 -m pip install playwright` instead should fix it.*
+*Note - IN CASE OF ERROR: if `pip3 install playwright` raises an `externally-managed-environment` error, running `pip3 install playwright --break-system-packages` instead should fix it.*  
 *Note: the `install-deps` command might ask for your system password to install missing browser libraries.*
+
+Note: Calling `playwright` directly can sometimes fail if `~/.local/bin` isn't in the user's shell `$PATH`. Using `python3 -m` for all commands should circumvent this for most Linux environments:
+
+```
+python3 -m pip install playwright
+python3 -m playwright install chromium
+python3 -m playwright install-deps
+```
 
 With this, we have everything necessary.
 
