@@ -18,7 +18,15 @@ It has been made with the help of Gemini: I had never used Python before, and th
 - The download destination folder is chosen via command line parameters. Here will be stored said files.
 - You can set how to rename the downloaded files, based on how much information you want to be in the filename, via command line parameters.
 
-## Installation and launch
+
+## Downloading the script and folder set-up
+
+1. Create a new folder named `hearth` or `AAdownloaderScript` (or the name you prefer) on your computer.
+2. Download `hearth.py` and `requirements.txt` from this repository and put the files in the folder you just created (or download the whole repository as a `.zip` and extract it, before copying those two files from the extracted folder into your newly created folder).
+3. (Optional) inside of the `hearth` folder, make another folder in which your downloaded files will go. Name this second folder `AAdownloads` or anything you deem fit.
+
+
+## Component installation and script launch
 
 ### **Python installation and installation of necessary tools**
 This is a Python script. You will need to have Python (and Playwright) installed for it to run.
@@ -42,9 +50,11 @@ Alternatively, open CMD, type `python`, and press Enter. This will automatically
 
 The script needs a tool called "Playwright" to control the web browser.
 
-To install it, open CMD and paste this command:
+We can install it, as well as any other dependency, via `requirements.txt`.
+
+To do this, open CMD directly inside of the folder that contains `hearth.py` and `requirements.txt`, or `cd` into it (the command should be `cd <pathToHearthFolder>`) and paste this command:
 ```
-python -m pip install playwright
+python -m pip install -r requirements.txt
 ```
 Once that finishes downloading and installing, paste this one:
 ```
@@ -63,36 +73,30 @@ sudo apt update && sudo apt install python3 python3-pip
 
 **Installation of necessary tools**:
 
-The script needs a tool called "Playwright" to control the web browser, plus a few system dependencies to run it.  
-Open your terminal and run these commands one by one:
+The script needs a tool called "Playwright" to control the web browser, plus a few system dependencies to run it. We can install them using the `requirements.txt` file.  
+Open your terminal directly inside of the folder that contains `hearth.py` and `requirements.txt`, or `cd` into it (the command should be `cd <pathToHearthFolder>`) and run these commands one by one:
 ```
-pip3 install playwright
+pip3 install -r requirements.txt
 playwright install chromium
 playwright install-deps
 ```
-*Note - IN CASE OF ERROR: if `pip3 install playwright` raises an `externally-managed-environment` error, running `pip3 install playwright --break-system-packages` instead should fix it.*  
+*Note - IN CASE OF ERROR: if `pip3 install -r requirements.txt` raises an `externally-managed-environment` error, running `pip3 install -r requirements.txt --break-system-packages` instead should fix it.*  
 *Note: the `install-deps` command might ask for your system password to install missing browser libraries.*
 
 Note: Calling `playwright` directly can sometimes fail if `~/.local/bin` isn't in the user's shell `$PATH`. Using `python3 -m` for all commands should circumvent this for most Linux environments:
 
 ```
-python3 -m pip install playwright
+python3 -m pip install -r requirements.txt
 python3 -m playwright install chromium
 python3 -m playwright install-deps
 ```
 
 With this, we have everything necessary.
 
-### Downloading the script and launch
 
-#### Downloading the script and folder set-up
-1. Create a new folder named `hearth` or `AAdownloaderScript` (or the name you prefer) on your computer.
-2. Download `hearth.py` from this repository and put the file in the folder you just created.
-3. (Optional) inside of the folder, make another folder in which your downloaded files will go. Name this second folder `AAdownloads` or anything you deem fit.
+### Script launch
 
-#### Script launch
-
-To launch hearth, simply open your terminal directly inside of the folder that contains `hearth.py` or `cd` into it (the command should be `cd <pathToHearthFolder>`) and paste the following command:
+To launch hearth, simply open your terminal directly inside of the folder that contains `hearth.py` (you can delete `requirements.txt` at this point if you so desire) or `cd` into it (the command should be `cd <pathToHearthFolder>`) and paste the following command:
 ```
 python hearth.py
 ```
