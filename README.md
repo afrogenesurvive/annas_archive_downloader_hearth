@@ -18,6 +18,13 @@ It has been made with the help of Gemini: I had never used Python before, and th
 - The download destination folder is chosen via command line parameters. Here will be stored said files.
 - You can set how to rename the downloaded files, based on how much information you want to be in the filename, via command line parameters.
 
+> **Two companion tools live in this repository too**: `find_pdfs.py`
+> (download the *open-access* PDF of each reference in `references.txt`) and
+> `extract_refs.py` (pull every article / book / report / web source out of any
+> `.md`/`.txt` document). See the
+> [workflow section](#companion-tools-extract_refspy-and-find_pdfspy) at the
+> bottom of this file for how the three scripts fit together.
+
 
 ## Downloading the script and folder set-up
 
@@ -189,5 +196,134 @@ This project is under the MIT license. Check out `LICENSE` for more details.
 This project is still new, I know little about Python and I have a lot to learn.
 
 If you have any issues or bugs to report, please feel free to do so. Same thing goes for suggestions or improvements.
+
+---
+
+## Companion tools: `extract_refs.py` and `find_pdfs.py`
+
+This repository now contains **three** scripts that each do one job. Used
+together they cover the whole path from *a research document* to *files on
+your disk*:
+
+| Script | What it does | Input | Output | Dependencies |
+| --- | --- | --- | --- | --- |
+| `extract_refs.py` | Extracts every article, book, report and web source mentioned in a document | any `.md` / `.txt` file | a readable bibliography (Markdown or text) with incomplete entries flagged | none |
+| `find_pdfs.py` | Downloads the *open-access* PDF for each reference | a numbered `references.txt` | PDFs plus a log (found / paywalled / missing) | none (Playwright optional) |
+| `hearth.py` | Bulk-downloads the items of an Anna's Archive **List** you curated | an AA List URL or `aa_links.txt` | the downloaded files | Playwright |
+
+```mermaid
+flowchart LR
+    A["Research document (.md / .txt)"] --> B["extract_refs.py"]
+    B --> C["Readable bibliography"]
+    C -. "tidy up; keep the numbered format" .-> D["references.txt"]
+    D --> E["find_pdfs.py"]
+    E --> F["Open-access PDFs + log"]
+    E --> G["Paywalled / not found (logged)"]
+    G -. "search on Anna's Archive, build a List" .-> H["hearth.py"]
+    H --> I["Bulk downloads from your List"]
+```
+
+### Why are `hearth.py` and `find_pdfs.py` two separate scripts?
+
+They download from **different worlds**, so keeping them separate is the
+point:
+
+* `hearth.py` is a **site-specific bulk downloader**. It needs the concrete
+  Anna's Archive `/md5/...` links of a List (or an `aa_links.txt`) and then
+  mass-downloads them. It **cannot search by title** and does not know what
+  "open access" means.
+* `find_pdfs.py` is a **legal, open-access finder**. Given a scholarly
+  reference it searches [OpenAlex](https://openalex.org) by
+  *title / author / year* and grabs the newest **openly licensed** PDF. It
+  never touches Anna's Archive and needs no links up-front.
+
+So the division of labour is: use `find_pdfs.py` for everything you can get
+for free and legally; for the books and paywalled titles it could not find,
+curate an Anna's Archive List and let `hearth.py` do the heavy downloading.
+
+### Where `extract_refs.py` fits
+
+`references.txt` (the numbered list that `find_pdfs.py` reads) is the shared
+interface between the two companions. `extract_refs.py` is the "front door":
+instead of typing a reference list by hand, point it at any `.md` or `.txt`
+research document and it pulls out all the published sources for you. If you
+keep the same numbered format, that list can be handed straight to
+`find_pdfs.py`; whatever `find_pdfs.py` cannot obtain in open access is
+exactly what you would go and look for on Anna's Archive for `hearth.py`.
+
+---
+
+## Companion tool: `extract_refs.py` (reference extractor)
+
+`extract_refs.py` extracts **articles, scholarly references and other
+published references** (books, chapters, reports, web pages, preprints,
+DOIs, arXiv/PubMed IDs) from a plain-text (`.txt`) or Markdown (`.md`) file.
+It understands formal reference lists (APA/MLA/Vancouver style, numbered or
+not), inline citations like `(Smith & Jones, 2020)`, narrative ones like
+`Smith et al. (2020)`, hyperlinks and bare URLs. Detected sources are
+de-duplicated, grouped by type, annotated with where they are cited, and
+anything incomplete lands in a clearly-marked "needs review" section —
+nothing is ever guessed. It needs no third-party packages and makes no
+network calls.
+
+### Usage
+
+```
+python extract_refs.py paper.md                          # print a Markdown bibliography
+python extract_refs.py notes.txt -o bibliography.md      # write a report file
+python extract_refs.py paper.md --format txt             # plain-text report
+python extract_refs.py paper.md --order alpha            # alphabetise by author
+python extract_refs.py paper.md --no-context             # drop the section/line notes
+```
+
+### Notes / limitations
+
+- Detection is deliberately conservative: anything ambiguous goes to the
+  "needs review" section rather than being reported as a confident reference.
+- It reads the file only — it does not resolve or verify anything on the web.
+- Reference lists that are not under a `References`/`Bibliography` heading
+  are still recognised when the entries look clearly bibliographic.
+- A bibliography produced here is not automatically `references.txt`. To feed
+  `find_pdfs.py`, export the list in the same numbered format
+  (`N.  Author, A. (Year). "Title." Source...`) that `references.txt` uses.
+
+---
+
+## Companion tool: `find_pdfs.py` (open-access PDF finder)
+
+`hearth.py` deals with downloads from a specific site. `find_pdfs.py` is a
+separate, strictly **open-access** helper: it reads the references in
+`references.txt`, looks each one up on [OpenAlex](https://openalex.org), and
+downloads the newest edition that has an **openly licensed PDF** (arXiv, PMC,
+repositories, OA journals, etc.). Paywalled works are logged as not-found and
+skipped. It needs no extra dependencies beyond the project venv.
+
+### Usage
+
+```
+python find_pdfs.py references.txt ./pdfs                 # download OA PDFs
+python find_pdfs.py references.txt ./pdfs --email you@example.com   # recommended
+python find_pdfs.py --dry-run                             # preview only, no downloads
+python find_pdfs.py references.txt ./pdfs --browser       # retry blocked PDFs in Chromium
+```
+
+- `--email` enables Unpaywall direct-PDF resolution and the OpenAlex polite
+  pool (use your own address). Recommended but not required.
+- `--browser` retries, in a real headed Chromium (Playwright), any PDF that
+  plain HTTP could not fetch — some publisher CDNs block scripted downloads.
+- A timestamped log is written to `<download_dir>/find_pdfs_log.txt` and shown
+  in the console: which reference is being considered, the current stage
+  (searching / downloading), found or not-found, download progress, and the
+  success/failure reason for every item.
+
+### Notes / limitations
+
+- Only *open-access* results are downloaded; many scholarly references are
+  paywalled and will be reported as "no open-access PDF available" and skipped.
+- Reference matching is deliberately conservative (title overlap + year +
+  author surname) so an unrelated OA paper sharing keywords is never grabbed.
+- Publisher CDNs (e.g. Wiley, Taylor & Francis, MDPI) commonly return HTTP 403
+  to scripts; those files can usually be fetched with `--browser` or saved
+  manually from the logged PDF link.
 
 

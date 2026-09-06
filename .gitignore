@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# hearth runtime artifacts (created in whatever download dir you choose)
+aa_links.txt
+completed.txt
+failed_downloads.json
+
+# OS
+.DS_Store

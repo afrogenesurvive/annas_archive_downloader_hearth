@@ -1,0 +1,94 @@
+REFERENCES
+
+------------------------------------------------------------------------
+1.  Mazur, J., & Odum, A. (2023). "Reinforcement Schedules." In
+    Experimental Analyses and Applications. Taylor & Francis.
+    (Cited for FR, VR, FI, VI cumulative-record analyses.)
+
+2.  Chen, X., & Reed, P. (2020). "Factors controlling the
+    micro-structure of human free-operant behaviour." Behavioural
+    Processes, 175, 104106.
+
+3.  Buskist, W. F., et al. (1981). "Effects of instructional
+    constraints on human fixed-interval performance." Journal of the
+    Experimental Analysis of Behavior, 35(2), 217-234.
+
+4.  Chen, X., & Reed, P. (2023). "Effect of instructions on the
+    microstructure of human schedule performance." Journal of
+    Experimental Psychology: Animal Learning and Cognition, 50(1),
+    56-68.
+
+
+10. [No author given] (2025). Japanese study on human operant
+    behavior across FR/VR/FI/VI schedules. Japanese Journal of
+    Behavior Analysis, 40(1), 2-17.
+    [INCOMPLETE - author names not given in source.]
+
+
+12. Kapp, K. M. (2012). The Gamification of Learning and Instruction.
+    [Source cites only "Table 3.2" of this book with no author/year;
+    attribution inferred to the known text. Verify.]
+
+
+1.  Filatova, O. A., et al. (2024). "Dolphin self-talk: unusual
+    acoustic behaviour of a solitary bottlenose dolphin."
+    Bioacoustics.
+    (Listed 3x in source under National Geographic / Science et Vie /
+    BBC Wildlife coverage; single underlying study.)
+
+2.  Nature Portfolio (2024). "Table 1 Overview of food
+    contrafreeloading studies." Nature.
+    [INCOMPLETE - title/author as given in source; likely a summary
+    of the 2024 contrafreeloading review.]
+
+3.  [No author given] (2024). "Animal play and evolution: Seven
+    timely research issues about enigmatic phenomena."
+    Neuroscience & Biobehavioral Reviews.
+    [INCOMPLETE - author names not given in source.]
+
+4.  Winding, et al. (2023) & Dorkenwald, et al. (2024). "Striking
+    parallels between the dopaminergic systems of flies and
+    mammals." ScienceDirect.
+    [INCOMPLETE - source conflates two works under one title.]
+
+5.  Benito-Gutierrez, et al. (2021) & Tolstenkov, et al. (2023).
+    "The dopamine system from an evolutionary perspective."
+    ScienceDirect.
+    [INCOMPLETE - source conflates two works; exact journals not
+    given.]
+
+6.  [No author given] (2024). "Leaves of three aromatic damaged plant
+    show more sensitive kin recognition than their roots through
+    volatile organic compounds." ScienceDirect.
+    [INCOMPLETE - author names not given in source.]
+
+7.  Hussain, A., Rodriguez-Ramos, J. C., & Erbilgin, N. (2019).
+    "Spatial characteristics of volatile communication in lodgepole
+    pine trees: Evidence of kin recognition and intra-species
+    support." Elsevier. (Elsevier = publisher umbrella.)
+
+8.  Park, H., Pontius, W., Guet, C. C., Marko, J., Emonet, T., &
+    Cluzel, P. (2010). "Interdependence of behavioural variability
+    and response to small stimuli in bacteria." Nature, 468,
+    819-823.
+    (Cited in source for both bacterial "personalities" and
+    chemotaxis/molecular decision-making.)
+
+9.  [No author given] (2025). "Epigenetic cellular memory in
+    Pseudomonas aeruginosa generates phenotypic variation in
+    response to host environments." PNAS.
+    [INCOMPLETE - author names not given in source.]
+
+10. [No author given] (2025). "A natural bacterial pathogen of
+    C. elegans uses a small RNA to induce transgenerational
+    inheritance of learned avoidance." OUCI (Ohio State /
+    repository identifier).
+    [INCOMPLETE - author names not given in source.]
+
+
+12. Kaletsky, R., et al. (2020). "C. elegans interprets bacterial
+    non-coding RNAs to learn pathogenic avoidance." Nature, 586,
+    445.
+
+========================================================================
+END OF REFERENCES
