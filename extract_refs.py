@@ -34,6 +34,9 @@ Usage
     python extract_refs.py paper.md --order alpha          # alphabetise by author
     python extract_refs.py paper.md --no-context           # drop section annotations
     python extract_refs.py paper.md --no-dedupe            # keep every raw hit
+    python extract_refs.py paper.md --numbered -o references.txt
+                          # emit a references.txt-style numbered list that
+                          # find_pdfs.py can consume directly
 """
 
 import argparse
@@ -923,8 +926,12 @@ def issues_for(rec):
 # ---------------------------------------------------------------------------
 # Rendering
 # ---------------------------------------------------------------------------
-def _render_citation_line(rec):
-    """Render one reference as a single text line (no leading numbering)."""
+def _render_citation_line(rec, quote_all=False):
+    """Render one reference as a single text line (no leading numbering).
+
+    With quote_all=True every title is wrapped in double quotes (books too),
+    so the line is directly parseable by find_pdfs.py's quoted-title reader.
+    """
     year = (" (%s)" % rec["year"]) if rec.get("year") else ""
     author = (rec.get("authors") or "").strip()
     title = rec.get("title")
@@ -941,7 +948,8 @@ def _render_citation_line(rec):
     elif rec.get("year"):
         parts.append("[no author]%s" % year)
     if title:
-        if rec.get("kind") in ("journal", "preprint", "conference"):
+        if quote_all or rec.get("kind") in ("journal", "preprint",
+                                            "conference"):
             parts.append('"%s"' % title)
         else:
             parts.append("*%s*" % title)
@@ -1055,6 +1063,27 @@ def render_txt(path, recs, unresolved, total_inline, opts):
     return "\n".join(out) + "\n"
 
 
+def render_numbered(recs, opts):
+    """Render deduplicated records as a flat, references.txt-style numbered
+    list (one citation per line, every title in double quotes) that
+    find_pdfs.py can consume directly. Records without a usable title are
+    skipped (they cannot be searched for).
+
+    Returns (text, emitted, skipped) where skipped is the list of records
+    that had no title to search on."""
+    usable = [r for r in recs if (r.get("title") or "").strip()]
+    skipped = [r for r in recs if not (r.get("title") or "").strip()]
+    if opts.order == "alpha":
+        usable = sorted(usable,
+                        key=lambda r: ((r.get("authors") or "").lower(),
+                                       r.get("year") or 0))
+    lines = []
+    for i, rec in enumerate(usable, 1):
+        lines.append("%d.  %s" % (i, _render_citation_line(rec,
+                                                           quote_all=True)))
+    return ("\n".join(lines) + "\n" if lines else ""), len(usable), skipped
+
+
 # ---------------------------------------------------------------------------
 # Driver
 # ---------------------------------------------------------------------------
@@ -1093,12 +1122,21 @@ def run(args):
         logger.warning("--no-dedupe is not yet implemented; "
                        "deduplication stayed on.")
 
-    body = (render_markdown(args.input, complete, unresolved, total_inline,
-                            args)
-            if args.format == "md" else
-            render_txt(args.input, complete, unresolved, total_inline, args))
+    if args.numbered:
+        body, n_emitted, skipped = render_numbered(recs, args)
+        logger.info("Numbered list emitted %d reference(s).", n_emitted)
+        if skipped:
+            logger.warning("Skipped %d record(s) with no usable title: %s",
+                           len(skipped), "; ".join(
+                               (r.get("raw") or "")[:60] for r in skipped))
+    else:
+        body = (render_markdown(args.input, complete, unresolved,
+                                total_inline, args)
+                if args.format == "md" else
+                render_txt(args.input, complete, unresolved,
+                           total_inline, args))
 
-    if review:
+    if review and not args.numbered:
         if args.format == "md":
             extra = ["## Possibly incomplete / needs review", ""]
             for r in review:
@@ -1148,6 +1186,10 @@ def build_parser():
                    help="omit section/line annotations from the report")
     p.add_argument("--no-dedupe", action="store_true",
                    help="reserved: keep every raw hit (not yet implemented)")
+    p.add_argument("--numbered", action="store_true",
+                   help="emit a flat, references.txt-style numbered list of "
+                        "records that have a title (skips the report "
+                        "sections); the file can be handed to find_pdfs.py")
     return p
 
 

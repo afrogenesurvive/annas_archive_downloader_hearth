@@ -274,6 +274,9 @@ python extract_refs.py notes.txt -o bibliography.md      # write a report file
 python extract_refs.py paper.md --format txt             # plain-text report
 python extract_refs.py paper.md --order alpha            # alphabetise by author
 python extract_refs.py paper.md --no-context             # drop the section/line notes
+python extract_refs.py paper.md --numbered -o references.txt
+                                                         # emit a references.txt-ready
+                                                         # numbered list for find_pdfs.py
 ```
 
 ### Notes / limitations
@@ -283,9 +286,12 @@ python extract_refs.py paper.md --no-context             # drop the section/line
 - It reads the file only — it does not resolve or verify anything on the web.
 - Reference lists that are not under a `References`/`Bibliography` heading
   are still recognised when the entries look clearly bibliographic.
-- A bibliography produced here is not automatically `references.txt`. To feed
-  `find_pdfs.py`, export the list in the same numbered format
-  (`N.  Author, A. (Year). "Title." Source...`) that `references.txt` uses.
+- A bibliography produced here is not automatically `references.txt`, but
+  `--numbered` emits exactly the numbered format `find_pdfs.py` reads
+  (`N.  Author, A. (Year). "Title." Source...`), one citation per line, with
+  every title in double quotes. Records without a usable title are skipped
+  and counted on stderr. Still give the file a quick human pass before the
+  PDF run.
 
 ---
 
@@ -305,12 +311,20 @@ python find_pdfs.py references.txt ./pdfs                 # download OA PDFs
 python find_pdfs.py references.txt ./pdfs --email you@example.com   # recommended
 python find_pdfs.py --dry-run                             # preview only, no downloads
 python find_pdfs.py references.txt ./pdfs --browser       # retry blocked PDFs in Chromium
+python find_pdfs.py references.txt ./pdfs --missing-out pending.txt
+                                                         # write the OA "gaps" to a file
 ```
 
 - `--email` enables Unpaywall direct-PDF resolution and the OpenAlex polite
   pool (use your own address). Recommended but not required.
 - `--browser` retries, in a real headed Chromium (Playwright), any PDF that
   plain HTTP could not fetch — some publisher CDNs block scripted downloads.
+- `--missing-out FILE` writes every reference that could NOT be obtained in
+  open access (paywalled, no match, or a failed fetch) to a clean, numbered
+  checklist — by default `<download_dir>/pending.txt`. That file is your
+  "what's left to hunt for" list, and once you fill the gaps in an entry it
+  can be fed straight back to `find_pdfs.py`. Add `--no-missing-out` to
+  disable writing it.
 - A timestamped log is written to `<download_dir>/find_pdfs_log.txt` and shown
   in the console: which reference is being considered, the current stage
   (searching / downloading), found or not-found, download progress, and the

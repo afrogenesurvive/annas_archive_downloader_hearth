@@ -23,6 +23,7 @@ Examples
     python find_pdfs.py references.txt ./pdfs
     python find_pdfs.py references.txt ./pdfs --email you@example.com
     python find_pdfs.py --dry-run                      # preview only
+    python find_pdfs.py references.txt ./pdfs --missing-out pending.txt
 
 Options
 -------
@@ -35,6 +36,12 @@ Options
     --browser         If a plain-HTTP download fails, retry the OA PDF in a
                       real (headed) Chromium via Playwright.
     --wait SECONDS    Polite delay between references. Default: 1.0
+    --missing-out FILE
+                      Write every reference that could NOT be obtained in
+                      open access to FILE as a clean, numbered list you can
+                      resolve by hand (and later re-run find_pdfs.py on).
+                      Default: <DOWNLOAD_DIR>/pending.txt. Use
+                      --no-missing-out to disable.
 """
 
 import argparse
@@ -660,6 +667,55 @@ def browser_download(pdf_url, dest_path, logger):
 
 
 # ---------------------------------------------------------------------------
+# Missing-reference export (pending.txt)
+# ---------------------------------------------------------------------------
+def _missing_citation(ref):
+    """One clean, re-parseable citation line for a reference that was not
+    obtained in open access, so the written list can be handed back to this
+    script (or read by a person) once the gaps are fixed. Prefers parsed
+    fields and falls back to the note-stripped raw entry text."""
+    title = (ref.get("title") or "").strip()
+    author = (ref.get("author") or "").strip()
+    year = ref.get("year")
+    if title and (author or year):
+        if author:
+            name = author.rstrip().rstrip(".")
+            head = "%s. (%d)." % (name, year) if year else "%s." % name
+        elif year:
+            head = "(%d)." % year
+        else:
+            head = ""
+        return '%s "%s".' % (head, title)
+    raw = re.sub(r"\s+", " ", _strip_notes(ref.get("raw") or "")).strip()
+    if raw:
+        return raw
+    return (ref.get("label") or "").strip()
+
+
+def write_pending(missing, path, logger):
+    """Write the references that could NOT be obtained in open access to a
+    clean, numbered list. The header/footer/dash lines are skipped by
+    parse_references(), so the file stays re-parseable by this script.
+    Returns the number of lines written (0 when nothing is missing)."""
+    if not missing:
+        logger.info("No references missing; not writing %s", path)
+        return 0
+    try:
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write("References without an open-access PDF copy "
+                     "(resolve manually, then re-run find_pdfs.py)\n")
+            fh.write("-" * 40 + "\n\n")
+            for i, ref in enumerate(missing, 1):
+                fh.write("%d.  %s\n" % (i, _missing_citation(ref)))
+            fh.write("\n" + "-" * 40 + "\n")
+        logger.info("Wrote %d missing reference(s) to %s", len(missing), path)
+    except OSError as exc:
+        logger.error("Could not write missing list %s: %s", path, exc)
+        return 0
+    return len(missing)
+
+
+# ---------------------------------------------------------------------------
 # Main pipeline
 # ---------------------------------------------------------------------------
 def run(args):
@@ -688,6 +744,7 @@ def run(args):
         logger.info("DRY-RUN mode: nothing will be downloaded.")
 
     n_downloaded = n_no_oa = n_not_found = n_failed = n_skipped = 0
+    missing = []
 
     for i, ref in enumerate(refs, 1):
         # (a) which publication is being considered
@@ -697,6 +754,7 @@ def run(args):
         if ref["title"] is None:
             logger.warning("  -> Could not parse a title from this entry; skipping.")
             n_not_found += 1
+            missing.append(ref)
             continue
 
         # (b) stage: searching
@@ -707,12 +765,14 @@ def run(args):
         except Exception as exc:  # API outage should not kill the run
             logger.error("  [stage] search error: %s", exc)
             n_failed += 1
+            missing.append(ref)
             continue
 
         if not res["found"]:
             # (c) result: not found
             logger.warning("  [result] NOT FOUND - %s", res["reason"])
             n_no_oa += 1
+            missing.append(ref)
             time.sleep(args.wait)
             continue
 
@@ -760,6 +820,7 @@ def run(args):
             # (e) failure + reason
             logger.error("  [done] DOWNLOAD FAILED - %s", msg)
             n_failed += 1
+            missing.append(ref)
 
         time.sleep(args.wait)
 
@@ -770,6 +831,12 @@ def run(args):
     logger.info("  Skipped (already present)   : %d", n_skipped)
     logger.info("  No open-access PDF          : %d", n_no_oa)
     logger.info("  Failed / errors             : %d", n_failed)
+    logger.info("  Missing (OA gap)            : %d", len(missing))
+
+    if args.write_missing:
+        missing_path = args.missing_out or os.path.join(
+            args.download_dir, "pending.txt")
+        write_pending(missing, missing_path, logger)
     return 0
 
 
@@ -798,6 +865,13 @@ def build_parser():
                         "Chromium via Playwright")
     p.add_argument("--wait", type=float, default=1.0,
                    help="politeness delay between references, seconds")
+    p.add_argument("--missing-out", dest="missing_out", default=None,
+                   metavar="FILE",
+                   help="write references with no open-access PDF to FILE "
+                        "(default: <download_dir>/pending.txt)")
+    p.add_argument("--no-missing-out", dest="write_missing",
+                   action="store_false", default=True,
+                   help="do not write the pending.txt missing-reference list")
     return p
 
 
